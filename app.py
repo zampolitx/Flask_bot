@@ -21,7 +21,7 @@ app = flask.Flask(__name__)
 def job():
     print("Время 8.00")
     time_now = datetime.date.today()
-    time_now = time_now.strftime('%Y-%m-%d')
+    time_now = time_now.strftime('%Y-%m-%d')                    # Строка вида '2020-12-01'
     print(time_now)
     #funktion принимает 2 аргумента query и id=False, возвращает список словарей
     m = db_question.funktion(query=time_now)                  # m - это словарь типа {'user_id': 'День рождения у Грищенов Сергей, 21.09.1985, 35 лет', ....}
