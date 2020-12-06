@@ -45,14 +45,14 @@ def funktion(query, id=False):              # В функцию работы с 
             print('query_list[1]', query_list[1])
             for row in conn.execute("select * from birthday where user_id=? and description like ?", (user_id, zapros+'%')):
                 #print(row)
-                mystr="{} у {}, {}".format(row[1], row[3], row[2])
+                mystr="{} у {}, {}".format(row[3], row[1], row[2])
                 resp_list.append(mystr)
             resp_dict = {}
             resp_dict[user_id]=resp_list
             glogal_list.append(resp_dict)
             return glogal_list
         else:                           # Если не события, то ФИО
-            for row in conn.execute("select * from birthday where user_id=? and full_name like ?", (user_id, zapros+'%')):
+            for row in conn.execute("select * from birthday where user_id=? and full_name like ?", (user_id, '%'+zapros+'%')):
                 #print(row)
                 mystr = "{} у {}, {}".format(row[3], row[1], row[2])
                 resp_list.append(mystr)
@@ -64,14 +64,17 @@ def funktion(query, id=False):              # В функцию работы с 
     elif query.count('-') == 2 and query.count(',') == 3 and user_id != False and query.startswith('добавить'):  # Если в запросе нет даты м есть chat_id
         try:
             query_list=query.split(',')
-            zapros = query_list[1].strip()  # Строка, содержит запрос '2020-12-12' без пробелов по краям
+            print(query_list)
+            date_bd = query_list[1].strip()         # Строка, содержит запрос '2020-12-12' без пробелов по краям
+            full_name=query_list[2].strip()         # Строка содержит ФИО, например 'Иванов Иван Иванович'
+            description=query_list[3].strip()       # Строка содержит название события, например 'день рождения'
             pass
         except:
             return query_user_error
         conn = sqlite3.connect(db_filename)  # Подключение к базе данных
         print('Значит запрос от пользователя и нужно добавить запись в бд')
         print('inserting')
-        result=['2020-12-12', 'Ivanov Ivan', 'день рождения', '12345678']
+        result=[date_bd, full_name, description, id]
         query_add = 'insert into birthday (date_bd, full_name, description, user_id) VALUES (?, ?, ?, ?)'
         conn.execute(query_add, result)
         # conn.execute(query, result) ## executemany нужен если передается список кортэжей
@@ -93,7 +96,9 @@ def funktion(query, id=False):              # В функцию работы с 
             goda = ''
             user_old_str=str(user_old)
             #print('user_old_str', user_old_str[-1:])
-            if user_old_str[-1:] == '1' or user_old_str[-1:] == '2' or user_old_str[-1:] == '3' or user_old_str[-1:] == '4':
+            if user_old_str[-1:] == '1':
+                goda='год'
+            elif user_old_str[-1:] == '2' or user_old_str[-1:] == '3' or user_old_str[-1:] == '4':
                 goda='года'
             else: goda='лет'
             #print(row)

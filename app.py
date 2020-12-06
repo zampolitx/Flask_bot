@@ -22,13 +22,17 @@ def job():
     print("Время 8.00")
     time_now = datetime.date.today()
     time_now = time_now.strftime('%Y-%m-%d')                    # Строка вида '2020-12-01'
+    #time_now='2020-03-21'
     print(time_now)
     #funktion принимает 2 аргумента query и id=False, возвращает список словарей
     m = db_question.funktion(query=time_now)                  # m - это словарь типа {'user_id': 'День рождения у Грищенов Сергей, 21.09.1985, 35 лет', ....}
     print('это ответ от бд{}'.format(m))
-    for answ in m:
-        bot.send_message(answ, m.get(answ))
-        print('это answ', answ)
+    for elem in m:
+        print('elem', elem)
+        for key, value in elem.items():                         # key = chat_id , value = '1999-12-12 день рождения у Иванов Иван Иваныч - 34 года
+            print('key', key)
+            print('value', value)
+            bot.send_message(key, value)
 
 def send_messages():
     bot.send_message('561518886', 'Привет, ')
@@ -77,30 +81,19 @@ def send_text(message):
     if len(query_list)==5 and query_list[0]=='добавить' and query_list[1].count('-')==2:                                # Если добавить, и есть дата вида YYYY-MM-DD
         query_list.pop(0)                                                                                               # Убираем 'Добавить' из списка
         if check_date(query_list[0])==False:                                                                            # Проверяем дату на валидность
-            result = tuple(query_list)  # Делаем из списка кортэж с 1 списком
-            print('result=', result)
-            db_question.db_query(result)
+            db_question.funktion(query, chat_id)
             bot.send_message(message.chat.id, 'Событие добавлено')
         else: bot.send_message(message.chat.id, check_date(query_list[0]))                                              # Если дата хреновая, пишем в сообщение, что нам не понравилось
 
     elif len(query_list)>=2 and query_list[0]=='показать':                                                              # query_list включает два элемента ['показать', 'день рождения/фамилия']
-        bot.send_message(message.chat.id, 'начинаем извлечение из бд')
-        db_request=query_list[1]                                                                                        # строка с запросом после 'показать'
-        print('Это query list{}', query_list)                                                                           #['показать', 'день рождения', 561518886]
-        if db_request.count('день') or db_request.count('годовщина'):
-            key='description'
-        else:
-            key='full_name'
-        query_str = '%' + query_list[1] + '%'
-        query_list2 = []
-        query_list2.append(query_str)                                       # В пустой список добавляем строку '%....%'
-        query_list2.append(chat_id)                                         # В список добавляем строку '......' с chat_id
-        result2 = tuple(query_list2)
-        print('это result2: {}', result2)                                   # ('%день рождения%', 561518886)
-        m=db_question.db_query_select(key, result2)                         #key=description/full_name; result2=(['%Иванов%, '561518886'])
+        #bot.send_message(message.chat.id, 'начинаем извлечение из бд')                                                                                        # строка с запросом после 'показать'
+        #print('Это query list{}', query_list)                                                                           #['показать', 'день рождения', 561518886]
+        m=db_question.funktion(query, chat_id)                         # m = [{chat_id:['День рождения у ...',
         print('это ответ от бд{}'.format(m))
-        for answ in m:
-            bot.send_message(message.chat.id, answ)
+        for elem in m:
+            for key, answ in elem.items():
+                for elem_2 in answ:
+                    bot.send_message(message.chat.id, elem_2)
 
     elif message.text.lower() == 'привет':
         bot.send_message(message.chat.id, 'Привет, мой создатель')
