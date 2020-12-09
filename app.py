@@ -11,7 +11,7 @@ import db_question
 
 API_TOKEN = token
 WEBHOOK_URL_BASE = url                                                      #https://6dc3bd5fa35c.ngrok.io
-WEBHOOK_URL_PATH = "/%s/" % (API_TOKEN)                                     #/1131808189:AAE5Qp5cSQ3EW7q4h-sj6sOZyGbLd6LT5G4/
+WEBHOOK_URL_PATH = "/%s/" % (API_TOKEN)                                     #/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/
 
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
@@ -25,7 +25,7 @@ def job():
     #time_now='2020-03-21'
     print(time_now)
     #funktion принимает 2 аргумента query и id=False, возвращает список словарей
-    m = db_question.funktion(query=time_now)                  # m - это словарь типа {'user_id': 'День рождения у Грищенов Сергей, 21.09.1985, 35 лет', ....}
+    m = db_question.funktion(query=time_now)                  # m - это словарь типа {'user_id': 'День рождения у Иванов Иван, 01.01.1111, 35 лет', ....}
     print('это ответ от бд{}'.format(m))
     for elem in m:
         print('elem', elem)
@@ -59,7 +59,7 @@ def index():
     return ''
 
 # Process webhook calls
-@app.route(WEBHOOK_URL_PATH, methods=['POST'])              #WEBHOOK_URL_PATH='/1131808189:AAE5Qp5cSQ3EW7q4h-sj6sOZyGbLd6LT5G4/'
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])              #WEBHOOK_URL_PATH='/xxxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/'
 def webhook():
     if flask.request.headers.get('content-type') == 'application/json':
         json_string = flask.request.get_data().decode('utf-8')
@@ -87,7 +87,7 @@ def send_text(message):
 
     elif len(query_list)>=2 and query_list[0]=='показать':                                                              # query_list включает два элемента ['показать', 'день рождения/фамилия']
         #bot.send_message(message.chat.id, 'начинаем извлечение из бд')                                                                                        # строка с запросом после 'показать'
-        #print('Это query list{}', query_list)                                                                           #['показать', 'день рождения', 561518886]
+        #print('Это query list{}', query_list)                                                                           #['показать', 'день рождения', xchat_idx]
         m=db_question.funktion(query, chat_id)                         # m = [{chat_id:['День рождения у ...',
         print('это ответ от бд{}'.format(m))
         for elem in m:
@@ -99,8 +99,6 @@ def send_text(message):
         bot.send_message(message.chat.id, 'Привет, мой создатель')
     elif message.text.lower() == 'пока':
         bot.send_message(message.chat.id, 'Прощай, создатель')
-    elif message.text.lower() == 'я тебя люблю':
-        bot.send_sticker(message.chat.id, 'CAADAgADZgkAAnlc4gmfCor5YbYYRAI')
     else:
         bot.send_message(message.chat.id, 'Для добавления события делай такой запрос через запятую: Добавить, 2001-01-01, Иванов Иван Иваныч, Годовщина свадьбы')
 
@@ -124,7 +122,7 @@ def check_date(valid_date):                         #'1985.03.21'
 bot.remove_webhook()
 time.sleep(1)
 # Set webhook
-bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)        #https://6dc3bd5fa35c.ngrok.io/1131808189:AAE5Qp5cSQ3EW7q4h-sj6sOZyGbLd6LT5G4/
+bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)        #https://6dc3bd5fa35c.ngrok.io/xxxxxxxxxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/
 
 # Start flask server
 app.run(debug=True)
